@@ -232,6 +232,11 @@ public final class ZipDialog extends JDialog {
 			}
 		}
 	}
+	
+	private synchronized boolean doZip(File[] files, String zippath)
+			throws IOException {
+		
+	}
 
 	/**
 	 * @deprecated
