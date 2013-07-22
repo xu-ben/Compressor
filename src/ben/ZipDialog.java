@@ -56,7 +56,7 @@ public final class ZipDialog extends JDialog {
 		JPanel ret = new JPanel();
 		ret.setLayout(new GridLayout(6, 1));
 
-		JButton buttonZip = new JButton("压缩文件成ZIP格式...");
+		JButton buttonZip = new JButton("打包并压缩文件成ZIP格式...");
 		buttonZip.addActionListener(new ActionAdapter() {
 			public void run() {
 				onZipButtonClick();
@@ -65,43 +65,23 @@ public final class ZipDialog extends JDialog {
 		ret.add(buttonZip);
 
 		JButton buttonGZip = new JButton("压缩文件成GZIP格式...");
-		buttonGZip.addActionListener(new ActionAdapter() {
-			public void run() {
-				JOptionPane.showMessageDialog(ZipDialog.this, "暂未实现，敬请期待");
-			}
-		});
+		buttonGZip.addActionListener(new ActionAdapter());
 		ret.add(buttonGZip);
 
 		JButton buttonTar = new JButton("打包文件成TAR格式...");
-		buttonTar.addActionListener(new ActionAdapter() {
-			public void run() {
-				JOptionPane.showMessageDialog(ZipDialog.this, "暂未实现，敬请期待");
-			}
-		});
+		buttonTar.addActionListener(new ActionAdapter());
 		ret.add(buttonTar);
 
-		JButton buttonRar = new JButton("压缩文件成RAR格式...");
-		buttonRar.addActionListener(new ActionAdapter() {
-			public void run() {
-				JOptionPane.showMessageDialog(ZipDialog.this, "暂未实现，敬请期待");
-			}
-		});
+		JButton buttonRar = new JButton("打包并压缩文件成RAR格式...");
+		buttonRar.addActionListener(new ActionAdapter());
 		ret.add(buttonRar);
 
-		JButton button7Zip = new JButton("压缩文件成7ZIP格式...");
-		button7Zip.addActionListener(new ActionAdapter() {
-			public void run() {
-				JOptionPane.showMessageDialog(ZipDialog.this, "暂未实现，敬请期待");
-			}
-		});
+		JButton button7Zip = new JButton("打包并压缩文件成7ZIP格式...");
+		button7Zip.addActionListener(new ActionAdapter());
 		ret.add(button7Zip);
 
 		JButton buttonBz2 = new JButton("压缩文件成BZ2格式...");
-		buttonBz2.addActionListener(new ActionAdapter() {
-			public void run() {
-				JOptionPane.showMessageDialog(ZipDialog.this, "暂未实现，敬请期待");
-			}
-		});
+		buttonBz2.addActionListener(new ActionAdapter());
 		ret.add(buttonBz2);
 
 		return ret;
@@ -109,33 +89,129 @@ public final class ZipDialog extends JDialog {
 
 	private JPanel getEastPanel() {
 		JPanel ret = new JPanel();
-		ret.setLayout(new GridLayout(3, 1));
+		ret.setLayout(new GridLayout(6, 1));
 
-		JButton buttonCrackRar = new JButton("暴力破解rar文件密码...");
-		buttonCrackRar.addActionListener(new ActionAdapter() {
-			public void run() {
-				JOptionPane.showMessageDialog(ZipDialog.this, "暂未实现，敬请期待");
-			}
-		});
-		ret.add(buttonCrackRar);
-
-		JButton buttonCrackZip = new JButton("暴力破解zip文件密码...");
-		buttonCrackZip.addActionListener(new ActionAdapter() {
-			public void run() {
-				JOptionPane.showMessageDialog(ZipDialog.this, "暂未实现，敬请期待");
-			}
-		});
-		ret.add(buttonCrackZip);
-
-		JButton buttonUpZip = new JButton("解压或解包文件...");
+		JButton buttonUpZip = new JButton("解压解包ZIP文件...");
 		buttonUpZip.addActionListener(new ActionAdapter() {
 			public void run() {
-				onUnZipButtonClick();
+				onUnArchiverFile(new MyZip(), zipfilter);
 			}
 		});
 		ret.add(buttonUpZip);
 
+		JButton buttonUnGZip = new JButton("解压GZIP文件...");
+		buttonUnGZip.addActionListener(new ActionAdapter() {
+			public void run() {
+				onUnArchiverFile(new MyGZip(), gzipfilter);
+			}
+		});
+		ret.add(buttonUnGZip);
+
+		JButton buttonUnTar = new JButton("解包TAR文件...");
+		buttonUnTar.addActionListener(new ActionAdapter() {
+		});
+		ret.add(buttonUnTar);
+
+		JButton buttonUnRar = new JButton("解压解包RAR文件...");
+		buttonUnRar.addActionListener(new ActionAdapter() {
+			public void run() {
+				onUnArchiverFile(new MyRar(), rarfilter);
+			}
+		});
+		ret.add(buttonUnRar);
+
+		JButton buttonUn7zip = new JButton("解压解包7ZIP文件...");
+		buttonUn7zip.addActionListener(new ActionAdapter() {
+		});
+		ret.add(buttonUn7zip);
+
+		JButton buttonUnBzip2 = new JButton("解压BZIP2文件...");
+		buttonUnBzip2.addActionListener(new ActionAdapter() {
+		});
+		ret.add(buttonUnBzip2);
+
+		// JButton buttonCrackRar = new JButton("暴力破解rar文件密码...");
+		// buttonCrackRar.addActionListener(new ActionAdapter() {
+		// public void run() {
+		// JOptionPane.showMessageDialog(ZipDialog.this, "暂未实现，敬请期待");
+		// }
+		// });
+		// ret.add(buttonCrackRar);
+		//
+		// JButton buttonCrackZip = new JButton("暴力破解zip文件密码...");
+		// buttonCrackZip.addActionListener(new ActionAdapter() {
+		// public void run() {
+		// JOptionPane.showMessageDialog(ZipDialog.this, "暂未实现，敬请期待");
+		// }
+		// });
+		// ret.add(buttonCrackZip);
+
 		return ret;
+	}
+
+	private File getSelectedArchiverFile(FileNameExtensionFilter filter) {
+		JFileChooser o = new JFileChooser("");
+		o.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		o.setMultiSelectionEnabled(false);
+		o.addChoosableFileFilter(filter);
+		int returnVal = o.showOpenDialog(this);
+		if (returnVal != JFileChooser.APPROVE_OPTION) {
+			return null;
+		}
+		return o.getSelectedFile();
+	}
+
+	private void onUnArchiverFile(MyArchiver ma, FileNameExtensionFilter filter) {
+		File f = getSelectedArchiverFile(filter);
+		if(f == null) {
+			return ;
+		}
+		JFileChooser s = new JFileChooser("");
+		s.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		int returnVal = s.showSaveDialog(this);
+		if (returnVal != JFileChooser.APPROVE_OPTION) {
+			return;
+		}
+		String filepath = s.getSelectedFile().getAbsolutePath();
+
+		String password = null;
+		while (true) {
+			try {
+				ma.doUnArchiver(f, filepath, password);
+				break;
+			} catch (RarException re) {
+				password = JOptionPane.showInputDialog(this,
+						"压缩文件疑似已加密，请输入解压密码");
+				if (password == null) {
+					return;
+				}
+			} catch (IOException ioe) {
+				ioe.printStackTrace();
+				break;
+			}
+		}
+	}
+
+	private void onUnCompressFile(MyArchiver ma, File f) {
+//		JFileChooser s = new JFileChooser("");
+//		s.setFileSelectionMode(JFileChooser.FILES_ONLY);
+//		s.addChoosableFileFilter(tarfilter);
+//		returnVal = s.showSaveDialog(this);
+//		if (returnVal != JFileChooser.APPROVE_OPTION) {
+//			return;
+//		}
+//		String filepath = s.getSelectedFile().getAbsolutePath();
+//		if (!filepath.matches(".*\\.(?i)(tar)")) {
+//			filepath += ".tar";
+//		}
+//
+//		try {
+//			MyGZip mygzip = new MyGZip();
+//			mygzip.doUnArchiver(file, filepath, null);
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+
 	}
 
 	private void onZipButtonClick() {
@@ -164,78 +240,6 @@ public final class ZipDialog extends JDialog {
 			ma.doArchiver(files, filepath);
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
-
-	}
-
-	private void onUnZipButtonClick() {
-		JFileChooser o = new JFileChooser("");
-		o.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		o.setMultiSelectionEnabled(false);
-		o.addChoosableFileFilter(tarfilter);
-		o.addChoosableFileFilter(gzipfilter);
-		o.addChoosableFileFilter(zipfilter);
-		o.addChoosableFileFilter(rarfilter);
-		int returnVal = o.showOpenDialog(this);
-		if (returnVal != JFileChooser.APPROVE_OPTION) {
-			return;
-		}
-		File file = o.getSelectedFile();
-
-		JFileChooser s = new JFileChooser("");
-		if (gzipfilter.accept(file)) {
-			s.setFileSelectionMode(JFileChooser.FILES_ONLY);
-			s.addChoosableFileFilter(tarfilter);
-			returnVal = s.showSaveDialog(this);
-			if (returnVal != JFileChooser.APPROVE_OPTION) {
-				return;
-			}
-			String filepath = s.getSelectedFile().getAbsolutePath();
-			if (!filepath.matches(".*\\.(?i)(tar)")) {
-				filepath += ".tar";
-			}
-
-			try {
-				MyGZip mygzip = new MyGZip();
-				mygzip.doUnArchiver(file, filepath, null);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			return ;
-		} 
-		s.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		returnVal = s.showSaveDialog(this);
-		if (returnVal != JFileChooser.APPROVE_OPTION) {
-			return;
-		}
-		String filepath = s.getSelectedFile().getAbsolutePath();
-
-		if (zipfilter.accept(file)) {
-			try {
-				MyZip ma = new MyZip();
-				ma.doUnArchiver(file, filepath, null);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		} else if (tarfilter.accept(file)) {
-
-		} else if (rarfilter.accept(file)) {
-			MyRar ma = new MyRar();
-			String password = null;
-			while(true) {
-				try {
-					ma.doUnArchiver(file, filepath, password);
-					break;
-				} catch (RarException re) {
-					password = JOptionPane.showInputDialog(this, "压缩文件疑似已加密，请输入解压密码");
-					if(password == null) {
-						return;
-					}
-				} catch (IOException ioe) {
-					ioe.printStackTrace();
-					break;
-				}
-			}
 		}
 
 	}
@@ -340,6 +344,7 @@ public final class ZipDialog extends JDialog {
 		}
 
 		public void run() {
+			JOptionPane.showMessageDialog(ZipDialog.this, "暂未实现，敬请期待");
 		}
 	}
 
