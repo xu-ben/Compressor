@@ -1,7 +1,7 @@
 /*
  * 文件名：		ZipDialog.java
  * 创建日期：	2013-7-12
- * 最近修改：	2013-7-21
+ * 最近修改：	2013-7-22
  * 作者：		徐犇
  */
 package ben;
@@ -14,17 +14,8 @@ import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
-
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -35,10 +26,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.filechooser.FileNameExtensionFilter;
-
-import de.innosystec.unrar.Archive;
 import de.innosystec.unrar.exception.RarException;
-import de.innosystec.unrar.rarfile.FileHeader;
 
 /**
  * 压缩解压zip文件的类
@@ -172,7 +160,8 @@ public final class ZipDialog extends JDialog {
 		}
 
 		try {
-			doZip(files, filepath);
+			MyZip ma = new MyZip();
+			ma.doArchiver(files, filepath);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -193,22 +182,8 @@ public final class ZipDialog extends JDialog {
 		}
 		File file = o.getSelectedFile();
 
-		if (zipfilter.accept(file)) {
-			JFileChooser s = new JFileChooser("");
-			s.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			returnVal = s.showSaveDialog(this);
-			if (returnVal != JFileChooser.APPROVE_OPTION) {
-				return;
-			}
-			String filepath = s.getSelectedFile().getAbsolutePath();
-
-			try {
-				doUnZip(file, filepath);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		} else if (gzipfilter.accept(file)) {
-			JFileChooser s = new JFileChooser("");
+		JFileChooser s = new JFileChooser("");
+		if (gzipfilter.accept(file)) {
 			s.setFileSelectionMode(JFileChooser.FILES_ONLY);
 			s.addChoosableFileFilter(tarfilter);
 			returnVal = s.showSaveDialog(this);
@@ -221,31 +196,35 @@ public final class ZipDialog extends JDialog {
 			}
 
 			try {
-				doUnGZip(file, new File(filepath));
+				MyGZip mygzip = new MyGZip();
+				mygzip.doUnArchiver(file, filepath, null);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return ;
+		} 
+		s.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		returnVal = s.showSaveDialog(this);
+		if (returnVal != JFileChooser.APPROVE_OPTION) {
+			return;
+		}
+		String filepath = s.getSelectedFile().getAbsolutePath();
+
+		if (zipfilter.accept(file)) {
+			try {
+				MyZip ma = new MyZip();
+				ma.doUnArchiver(file, filepath, null);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		} else if (tarfilter.accept(file)) {
-			JFileChooser s = new JFileChooser("");
-			s.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			returnVal = s.showSaveDialog(this);
-			if (returnVal != JFileChooser.APPROVE_OPTION) {
-				return;
-			}
-			String filepath = s.getSelectedFile().getAbsolutePath();
 
 		} else if (rarfilter.accept(file)) {
-			JFileChooser s = new JFileChooser("");
-			s.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			returnVal = s.showSaveDialog(this);
-			if (returnVal != JFileChooser.APPROVE_OPTION) {
-				return;
-			}
-			String filepath = s.getSelectedFile().getAbsolutePath();
+			MyRar ma = new MyRar();
 			String password = null;
 			while(true) {
 				try {
-					doUnRar(file, filepath, password);
+					ma.doUnArchiver(file, filepath, password);
 					break;
 				} catch (RarException re) {
 					password = JOptionPane.showInputDialog(this, "压缩文件疑似已加密，请输入解压密码");
@@ -344,7 +323,7 @@ public final class ZipDialog extends JDialog {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		ZipDialog zd = new ZipDialog(null);
+		new ZipDialog(null);
 	}
 
 	/**

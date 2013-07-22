@@ -50,7 +50,7 @@ public final class MyZip extends MyArchiver {
 	}
 
 	@Override
-	public void doArchiver(File[] files, String destpath) throws IOException {
+	public final void doArchiver(File[] files, String destpath) throws IOException {
 		/*
 		 * 定义一个ZipOutputStream 对象
 		 */
@@ -63,7 +63,7 @@ public final class MyZip extends MyArchiver {
 	}
 
 	@Override
-	public void doUnArchiver(File srcfile, String destpath, String password)
+	public final void doUnArchiver(File srcfile, String destpath, String password)
 			throws IOException {
 		byte[] buf = new byte[1024];
 		FileInputStream fis = new FileInputStream(srcfile);

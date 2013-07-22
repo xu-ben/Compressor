@@ -21,12 +21,12 @@ import java.util.zip.GZIPInputStream;
 public final class MyGZip extends MyArchiver {
 
 	@Override
-	public void doArchiver(File[] files, String destpath) throws IOException {
+	public final void doArchiver(File[] files, String destpath) throws IOException {
 		// TODO Auto-generated method stub
 	}
 
 	@Override
-	public void doUnArchiver(File srcfile, String destpath, String password)
+	public final void doUnArchiver(File srcfile, String destpath, String password)
 			throws IOException {
 		FileInputStream fis = new FileInputStream(srcfile);
 		GZIPInputStream gzis = new GZIPInputStream(fis);

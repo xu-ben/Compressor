@@ -22,11 +22,11 @@ import de.innosystec.unrar.rarfile.FileHeader;
 public final class MyRar extends MyArchiver {
 
 	@Override
-	public void doArchiver(File[] files, String destpath) throws IOException {
+	public final void doArchiver(File[] files, String destpath) throws IOException {
 	}
 
 	@Override
-	public void doUnArchiver(File srcfile, String destpath, String password)
+	public final void doUnArchiver(File srcfile, String destpath, String password)
 			throws IOException, RarException {
 		Archive a = new Archive(srcfile, password, false);
 		FileHeader fh; ;
