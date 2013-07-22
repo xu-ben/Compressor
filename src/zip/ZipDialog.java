@@ -89,24 +89,26 @@ public final class ZipDialog extends JDialog {
 		o.setMultiSelectionEnabled(true);
 		int returnVal = o.showOpenDialog(this);
 		if (returnVal != JFileChooser.APPROVE_OPTION) {
-			return ;
+			return;
 		}
 		File[] files = o.getSelectedFiles();
-		for (File child : files) {
-			System.out.println(child);
-		}
-		
+
 		JFileChooser s = new JFileChooser(".");
 		s.addChoosableFileFilter(zipfilter);
 		returnVal = s.showSaveDialog(this);
 		if (returnVal != JFileChooser.APPROVE_OPTION) {
-			return ;
+			return;
 		}
 		String filepath = s.getSelectedFile().getAbsolutePath();
 		if (!filepath.matches(".*\\.(?i)(zip)")) {
 			filepath += ".zip";
 		}
-		System.out.println(filepath);
+		
+		try {
+			doZip(files, filepath);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 	}
 
@@ -117,18 +119,18 @@ public final class ZipDialog extends JDialog {
 		o.addChoosableFileFilter(zipfilter);
 		int returnVal = o.showOpenDialog(this);
 		if (returnVal != JFileChooser.APPROVE_OPTION) {
-			return ;
+			return;
 		}
 		File file = o.getSelectedFile();
-		
+
 		JFileChooser s = new JFileChooser(".");
 		s.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		returnVal = s.showSaveDialog(this);
 		if (returnVal != JFileChooser.APPROVE_OPTION) {
-			return ;
+			return;
 		}
 		String filepath = s.getSelectedFile().getAbsolutePath();
-		
+
 		doUnZip(file, filepath);
 	}
 
@@ -190,6 +192,7 @@ public final class ZipDialog extends JDialog {
 					while ((len = zis.read(unzipbuf)) != -1) {
 						bos.write(unzipbuf, 0, len);
 					}
+					bos.flush();
 					bos.close();
 				}
 				zis.closeEntry();
@@ -201,6 +204,13 @@ public final class ZipDialog extends JDialog {
 		return true;
 	}
 
+	/**
+	 * @deprecated
+	 * @param srcdir
+	 * @param zos
+	 * @param fpath
+	 * @throws IOException
+	 */
 	private void dfs(File srcdir, ZipOutputStream zos, String fpath)
 			throws IOException {
 		File[] files = srcdir.listFiles();
@@ -232,10 +242,44 @@ public final class ZipDialog extends JDialog {
 			}
 		}
 	}
-	
+
+	private void dfs(File[] files, ZipOutputStream zos, String fpath)
+			throws IOException {
+		for (File child : files) {
+			if (child.isFile()) { // 文件
+				FileInputStream fis = new FileInputStream(child);
+				zos.putNextEntry(new ZipEntry(fpath + child.getName()));
+				int len;
+				while ((len = fis.read(zipbuf)) > 0) {
+					zos.write(zipbuf, 0, len);
+				}
+				fis.close();
+				zos.closeEntry();
+				continue;
+			}
+			File[] fs = child.listFiles();
+			String nfpath = fpath + child.getName() + "/";
+			if (fs.length <= 0) { // 空目录
+				zos.putNextEntry(new ZipEntry(nfpath));
+				zos.closeEntry();
+			} else { //目录非空，递归处理
+				dfs(fs, zos, nfpath);
+			}
+		}
+	}
+
 	private synchronized boolean doZip(File[] files, String zippath)
 			throws IOException {
-		
+		/*
+		 * 定义一个ZipOutputStream 对象
+		 */
+		FileOutputStream fos = new FileOutputStream(zippath);
+		BufferedOutputStream bos = new BufferedOutputStream(fos);
+		ZipOutputStream zos = new ZipOutputStream(bos);
+		dfs(files, zos, "");
+		zos.flush();
+		zos.close();
+		return true;
 	}
 
 	/**
@@ -260,30 +304,11 @@ public final class ZipDialog extends JDialog {
 		return true;
 	}
 
-	public static void testzip() {
-		File dir = new File("testk哈");
-		ZipDialog zd = new ZipDialog(null);
-		try {
-			zd.doZip(dir, "testk哈.zip");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public static void testupzip() {
-		File zf = new File("testk哈.zip");
-		ZipDialog zd = new ZipDialog(null);
-		zd.doUnZip(zf, "aaa\\");
-	}
-
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// testzip();
 		ZipDialog zd = new ZipDialog(null);
-		// testupzip();
-		// ZipDialog zd = new ZipDialog(null);
 	}
 
 }
