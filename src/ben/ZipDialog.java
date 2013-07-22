@@ -4,8 +4,9 @@
  * 最近修改：	2013-7-21
  * 作者：		徐犇
  */
-package zip;
+package ben;
 
+import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -19,16 +20,23 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.zip.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
+ * 压缩解压zip文件的类
  * @author ben
  * 
  */
@@ -53,17 +61,32 @@ public final class ZipDialog extends JDialog {
 
 	private JPanel getWestPanel() {
 		JPanel ret = new JPanel();
-		ret.setLayout(new GridLayout(1, 1));
-		JButton buttonZip = new JButton("压缩文件...");
-		buttonZip.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		ret.setLayout(new GridLayout(4, 1));
+		
+		JButton buttonZip = new JButton("压缩文件成ZIP格式...");
+		buttonZip.addActionListener(new ActionAdapter() {
+			public void run() {
 				onZipButtonClick();
-				setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			}
 		});
 		ret.add(buttonZip);
+		
+		JButton buttonGZip = new JButton("压缩文件成GZIP格式...");
+		buttonGZip.addActionListener(new ActionAdapter() {
+		});
+		ret.add(buttonGZip);
+		
+		JButton buttonTar = new JButton("打包文件成TAR格式...");
+		ret.add(buttonTar);
+		
+		JButton buttonRar = new JButton("压缩文件成RAR格式...");
+		buttonRar.addActionListener(new ActionAdapter() {
+			public void run() {
+				JOptionPane.showMessageDialog(ZipDialog.this, "暂未实现，敬请期待");
+			}
+		});
+		ret.add(buttonRar);
+		
 		return ret;
 	}
 
@@ -71,12 +94,9 @@ public final class ZipDialog extends JDialog {
 		JPanel ret = new JPanel();
 		ret.setLayout(new GridLayout(1, 1));
 		JButton buttonUpZip = new JButton("解压文件...");
-		buttonUpZip.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		buttonUpZip.addActionListener(new ActionAdapter() {
+			public void run() {
 				onUnZipButtonClick();
-				setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			}
 		});
 		ret.add(buttonUpZip);
@@ -133,14 +153,69 @@ public final class ZipDialog extends JDialog {
 
 		doUnZip(file, filepath);
 	}
+	
+	private JPanel getTopLeftPanel() {
+		JPanel ret = new JPanel();
+		
+		JLabel tips = new JLabel("文件编码:");		
+		ret.add(tips);
+		JRadioButton utf8 = new JRadioButton("UTF-8");
+		ret.add(utf8);
+		JRadioButton gbk = new JRadioButton("GBK");
+		ret.add(gbk);
+		
+		ButtonGroup bg = new ButtonGroup();
+		bg.add(utf8);
+		bg.add(gbk);
+		
+		utf8.setSelected(true);
+		
+		gbk.setEnabled(false);
+		
+		return ret;
+	}
+	
+	private JPanel getTopRightPanel() {
+		JPanel ret = new JPanel();
+		
+		JRadioButton uncode = new JRadioButton("非加密");
+		ret.add(uncode);
+		JRadioButton encode = new JRadioButton("加密");
+		ret.add(encode);
+		
+		ButtonGroup bg = new ButtonGroup();
+		bg.add(uncode);
+		bg.add(encode);
+		
+		uncode.setSelected(true);
+		encode.setEnabled(false);
+		
+		return ret;
+	}
+	
+	private JPanel getTopPanel() {
+		JPanel ret = new JPanel();
+		ret.setLayout(new GridLayout(1, 2));
+		ret.add(getTopLeftPanel());
+		ret.add(getTopRightPanel());
+		return ret;
+	}
+	
+	private JPanel getMainPanel() {
+		JPanel ret = new JPanel();
+		ret.setLayout(new GridLayout(1, 2));
+		ret.add(getWestPanel());
+		ret.add(getEastPanel());
+		return ret;
+	}
 
 	private ZipDialog(JFrame owner) {
 		super(owner, true);
 
 		Container con = getContentPane();
-		con.setLayout(new GridLayout(1, 2));
-		con.add(getWestPanel());
-		con.add(getEastPanel());
+		con.setLayout(new BorderLayout(0, 0));
+		con.add(getTopPanel(), BorderLayout.NORTH);
+		con.add(getMainPanel(), BorderLayout.CENTER);
 
 		/*
 		 * 通过得到屏幕尺寸，计算得到坐标，使对话框在屏幕上居中显示
@@ -309,6 +384,22 @@ public final class ZipDialog extends JDialog {
 	 */
 	public static void main(String[] args) {
 		ZipDialog zd = new ZipDialog(null);
+	}
+	
+	/**
+	 * 
+	 * @author ben
+	 *
+	 */
+	private class ActionAdapter implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+			run();
+			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+		}
+		public void run() {
+		}
 	}
 
 }
