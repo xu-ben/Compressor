@@ -102,7 +102,7 @@ public final class ZipDialog extends JDialog {
 		JButton buttonUnGZip = new JButton("解压GZIP文件...");
 		buttonUnGZip.addActionListener(new ActionAdapter() {
 			public void run() {
-				onUnArchiverFile(new MyGZip(), gzipfilter);
+				onUnCompressFile(new MyGZip(), gzipfilter);
 			}
 		});
 		ret.add(buttonUnGZip);
@@ -192,25 +192,28 @@ public final class ZipDialog extends JDialog {
 		}
 	}
 
-	private void onUnCompressFile(MyArchiver ma, File f) {
-//		JFileChooser s = new JFileChooser("");
-//		s.setFileSelectionMode(JFileChooser.FILES_ONLY);
-//		s.addChoosableFileFilter(tarfilter);
-//		returnVal = s.showSaveDialog(this);
-//		if (returnVal != JFileChooser.APPROVE_OPTION) {
-//			return;
-//		}
-//		String filepath = s.getSelectedFile().getAbsolutePath();
-//		if (!filepath.matches(".*\\.(?i)(tar)")) {
-//			filepath += ".tar";
-//		}
-//
-//		try {
-//			MyGZip mygzip = new MyGZip();
-//			mygzip.doUnArchiver(file, filepath, null);
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
+	private void onUnCompressFile(MyArchiver ma, FileNameExtensionFilter filter) {
+		File file = getSelectedArchiverFile(filter);
+		if(file == null) {
+			return ;
+		}
+		String fn = file.getName();
+		fn = fn.substring(0, fn.lastIndexOf('.'));
+		JFileChooser s = new JFileChooser("");
+		s.setSelectedFile(new File(fn));
+		s.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		int returnVal = s.showSaveDialog(this);
+		if (returnVal != JFileChooser.APPROVE_OPTION) {
+			return;
+		}
+		String filepath = s.getSelectedFile().getAbsolutePath();
+
+		try {
+			ma.doUnArchiver(file, filepath, null);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (RarException e) {
+		}
 
 	}
 
