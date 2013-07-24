@@ -59,17 +59,25 @@ public final class ZipDialog extends JDialog {
 		JButton buttonZip = new JButton("打包并压缩文件成ZIP格式...");
 		buttonZip.addActionListener(new ActionAdapter() {
 			public void run() {
-				onZipButtonClick();
+				onArchiverFile(new MyZip(), zipfilter);
 			}
 		});
 		ret.add(buttonZip);
 
 		JButton buttonGZip = new JButton("压缩文件成GZIP格式...");
-		buttonGZip.addActionListener(new ActionAdapter());
+		buttonGZip.addActionListener(new ActionAdapter() {
+			public void run() {
+				onCompressFile(new MyGZip(), gzipfilter);
+			}
+		});
 		ret.add(buttonGZip);
 
 		JButton buttonTar = new JButton("打包文件成TAR格式...");
-		buttonTar.addActionListener(new ActionAdapter());
+		buttonTar.addActionListener(new ActionAdapter() {
+			public void run() {
+				onArchiverFile(new MyTar(), tarfilter);
+			}
+		});
 		ret.add(buttonTar);
 
 		JButton buttonRar = new JButton("打包并压缩文件成RAR格式...");
@@ -109,6 +117,9 @@ public final class ZipDialog extends JDialog {
 
 		JButton buttonUnTar = new JButton("解包TAR文件...");
 		buttonUnTar.addActionListener(new ActionAdapter() {
+			public void run() {
+				onUnArchiverFile(new MyTar(), tarfilter);
+			}
 		});
 		ret.add(buttonUnTar);
 
@@ -161,7 +172,7 @@ public final class ZipDialog extends JDialog {
 		return o.getSelectedFile();
 	}
 
-	private void onUnArchiverFile(MyArchiver ma, FileNameExtensionFilter filter) {
+	private void onUnArchiverFile(Archiver ma, FileNameExtensionFilter filter) {
 		File f = getSelectedArchiverFile(filter);
 		if(f == null) {
 			return ;
@@ -192,7 +203,7 @@ public final class ZipDialog extends JDialog {
 		}
 	}
 
-	private void onUnCompressFile(MyArchiver ma, FileNameExtensionFilter filter) {
+	private void onUnCompressFile(Compressor ma, FileNameExtensionFilter filter) {
 		File file = getSelectedArchiverFile(filter);
 		if(file == null) {
 			return ;
@@ -209,15 +220,41 @@ public final class ZipDialog extends JDialog {
 		String filepath = s.getSelectedFile().getAbsolutePath();
 
 		try {
-			ma.doUnArchiver(file, filepath, null);
+			ma.doUnCompress(file, filepath);
 		} catch (IOException e) {
 			e.printStackTrace();
-		} catch (RarException e) {
 		}
 
 	}
+	
+	private void onCompressFile(Compressor ma, FileNameExtensionFilter filter) {
+		File f = getSelectedArchiverFile(null);
+		if(f == null) {
+			return;
+		}
+		String ext = "." + filter.getExtensions()[0]; 
+		String destpath = f.getName() + ext;
+		JFileChooser s = new JFileChooser("");
+		s.addChoosableFileFilter(filter);
+		s.setSelectedFile(new File(destpath));
+		int returnVal = s.showSaveDialog(this);
+		if (returnVal != JFileChooser.APPROVE_OPTION) {
+			return;
+		}
+		File ff = s.getSelectedFile();
+		destpath = ff.getAbsolutePath();
+		if(!filter.accept(ff)) {//确保一定有后缀
+			destpath += ext;
+		}
 
-	private void onZipButtonClick() {
+		try {
+			ma.doCompress(f, destpath);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void onArchiverFile(Archiver ma, FileNameExtensionFilter filter) {
 		JFileChooser o = new JFileChooser("");
 		o.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 		o.setMultiSelectionEnabled(true);
@@ -228,23 +265,22 @@ public final class ZipDialog extends JDialog {
 		File[] files = o.getSelectedFiles();
 
 		JFileChooser s = new JFileChooser("");
-		s.addChoosableFileFilter(zipfilter);
+		s.addChoosableFileFilter(filter);
 		returnVal = s.showSaveDialog(this);
 		if (returnVal != JFileChooser.APPROVE_OPTION) {
 			return;
 		}
-		String filepath = s.getSelectedFile().getAbsolutePath();
-		if (!filepath.matches(".*\\.(?i)(zip)")) {
-			filepath += ".zip";
+		File f = s.getSelectedFile();
+		String filepath = f.getAbsolutePath();
+		if(!filter.accept(f)) {//确保一定有后缀
+			filepath =  filepath + "." + filter.getExtensions()[0];
 		}
 
 		try {
-			MyZip ma = new MyZip();
 			ma.doArchiver(files, filepath);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	private JPanel getTopLeftPanel() {

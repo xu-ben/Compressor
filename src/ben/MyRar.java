@@ -19,7 +19,7 @@ import de.innosystec.unrar.rarfile.FileHeader;
  * @author ben
  *
  */
-public final class MyRar extends MyArchiver {
+public final class MyRar extends Archiver {
 
 	@Override
 	public final void doArchiver(File[] files, String destpath) throws IOException {

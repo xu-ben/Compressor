@@ -21,20 +21,17 @@ import java.util.zip.ZipOutputStream;
  * 使用java原生方法处理ZIP文件
  * @author ben 
  */
-public final class MyZip extends MyArchiver {
-
+public final class MyZip extends Archiver {
+	
 	private void dfs(File[] files, ZipOutputStream zos, String fpath)
 			throws IOException {
-		byte[] buf = new byte[1024];
 		for (File child : files) {
 			if (child.isFile()) { // 文件
 				FileInputStream fis = new FileInputStream(child);
+				BufferedInputStream bis = new BufferedInputStream(fis);
 				zos.putNextEntry(new ZipEntry(fpath + child.getName()));
-				int len;
-				while ((len = fis.read(buf)) > 0) {
-					zos.write(buf, 0, len);
-				}
-				fis.close();
+				BufferedOutputStream bos = new BufferedOutputStream(zos);
+				readAndWrite(bis, bos);				
 				zos.closeEntry();
 				continue;
 			}
