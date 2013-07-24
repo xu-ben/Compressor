@@ -12,11 +12,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-
 import javax.swing.filechooser.FileNameExtensionFilter;
-
 import org.apache.commons.compress.archivers.tar.*;
-import de.innosystec.unrar.exception.RarException;
 
 /**
  * @author ben
@@ -73,7 +70,7 @@ public final class MyTar extends Archiver {
 
 	@Override
 	public void doUnArchiver(File srcfile, String destpath, String password)
-			throws IOException, RarException {
+			throws IOException {
 		byte[] buf = new byte[1024];
 		FileInputStream fis = new FileInputStream(srcfile);
 		BufferedInputStream bis = new BufferedInputStream(fis);
