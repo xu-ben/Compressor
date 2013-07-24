@@ -11,6 +11,8 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
 
+import javax.swing.filechooser.FileNameExtensionFilter;
+
 import de.innosystec.unrar.exception.RarException;
 
 /**
@@ -36,22 +38,10 @@ public abstract class Archiver {
 	 * @throws RarException 
 	 */
 	public abstract void doUnArchiver(File srcfile, String destpath, String password) throws IOException, RarException;
-	
+		
 	/**
-	 * 从bis读取数据并写入bos中
-	 * @param bis
-	 * @param bos
-	 * @throws IOException
+	 * @return 本归档类对应文件的文件过滤器
 	 */
-	public void readAndWrite(BufferedInputStream bis, BufferedOutputStream bos) throws IOException {
-		byte[] buf = new byte[1024];
-		int len;
-		while((len = bis.read(buf)) > 0) {
-			bos.write(buf, 0, len);
-		}
-		bos.flush();
-		bos.close();
-		bis.close();
-	}
-	
+	public abstract FileNameExtensionFilter getFileFilter();
+		
 }

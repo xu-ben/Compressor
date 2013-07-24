@@ -11,6 +11,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import javax.swing.filechooser.FileNameExtensionFilter;
+
 import de.innosystec.unrar.Archive;
 import de.innosystec.unrar.exception.RarException;
 import de.innosystec.unrar.rarfile.FileHeader;
@@ -21,6 +23,9 @@ import de.innosystec.unrar.rarfile.FileHeader;
  */
 public final class MyRar extends Archiver {
 
+	private FileNameExtensionFilter filter = new FileNameExtensionFilter(
+			"RAR压缩文件(*.rar)", "rar");
+	
 	@Override
 	public final void doArchiver(File[] files, String destpath) throws IOException {
 	}
@@ -57,4 +62,8 @@ public final class MyRar extends Archiver {
 		a.close();
 	}
 
+	@Override
+	public final FileNameExtensionFilter getFileFilter() {
+		return this.filter;
+	}
 }

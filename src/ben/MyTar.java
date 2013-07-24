@@ -12,14 +12,20 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+
+import javax.swing.filechooser.FileNameExtensionFilter;
+
 import org.apache.commons.compress.archivers.tar.*;
 import de.innosystec.unrar.exception.RarException;
 
 /**
- * @author Administrator
+ * @author ben
  * 
  */
 public final class MyTar extends Archiver {
+
+	private FileNameExtensionFilter filter = new FileNameExtensionFilter(
+			"TAR打包文件(*.tar)", "tar");
 
 	private void dfs(File[] files, TarArchiveOutputStream taos, String fpath)
 			throws IOException {
@@ -99,4 +105,8 @@ public final class MyTar extends Archiver {
 		tais.close();
 	}
 
+	@Override
+	public final FileNameExtensionFilter getFileFilter() {
+		return this.filter;
+	}
 }

@@ -17,21 +17,34 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import javax.swing.filechooser.FileNameExtensionFilter;
+
 /**
  * 使用java原生方法处理ZIP文件
- * @author ben 
+ * 
+ * @author ben
  */
 public final class MyZip extends Archiver {
-	
+
+	/**
+	 * zip文件格式的过滤器
+	 */
+	private FileNameExtensionFilter filter = new FileNameExtensionFilter(
+			"ZIP压缩文件(*.zip)", "zip");
+
 	private void dfs(File[] files, ZipOutputStream zos, String fpath)
 			throws IOException {
+		byte[] buf = new byte[1024];
 		for (File child : files) {
 			if (child.isFile()) { // 文件
 				FileInputStream fis = new FileInputStream(child);
 				BufferedInputStream bis = new BufferedInputStream(fis);
 				zos.putNextEntry(new ZipEntry(fpath + child.getName()));
-				BufferedOutputStream bos = new BufferedOutputStream(zos);
-				readAndWrite(bis, bos);				
+				int len;
+				while((len = bis.read(buf)) > 0) {
+					zos.write(buf, 0, len);
+				}
+				bis.close();
 				zos.closeEntry();
 				continue;
 			}
@@ -47,7 +60,8 @@ public final class MyZip extends Archiver {
 	}
 
 	@Override
-	public final void doArchiver(File[] files, String destpath) throws IOException {
+	public final void doArchiver(File[] files, String destpath)
+			throws IOException {
 		/*
 		 * 定义一个ZipOutputStream 对象
 		 */
@@ -60,8 +74,8 @@ public final class MyZip extends Archiver {
 	}
 
 	@Override
-	public final void doUnArchiver(File srcfile, String destpath, String password)
-			throws IOException {
+	public final void doUnArchiver(File srcfile, String destpath,
+			String password) throws IOException {
 		byte[] buf = new byte[1024];
 		FileInputStream fis = new FileInputStream(srcfile);
 		BufferedInputStream bis = new BufferedInputStream(fis);
@@ -92,6 +106,11 @@ public final class MyZip extends Archiver {
 			zis.closeEntry();
 		}
 		zis.close();
+	}
+
+	@Override
+	public final FileNameExtensionFilter getFileFilter() {
+		return this.filter;
 	}
 
 }

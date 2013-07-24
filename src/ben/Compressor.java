@@ -11,6 +11,8 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
 
+import javax.swing.filechooser.FileNameExtensionFilter;
+
 /**
  * 压缩解压的基类
  * @author ben
@@ -51,4 +53,8 @@ public abstract class Compressor {
 		bis.close();
 	}
 
+	/**
+	 * @return 本归档类对应文件的文件过滤器
+	 */
+	public abstract FileNameExtensionFilter getFileFilter();
 }

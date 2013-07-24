@@ -1,7 +1,7 @@
 /*
- * 文件名：		MyGZip.java
- * 创建日期：	2013-7-22
- * 最近修改：	2013-7-22
+ * 文件名：		MyBZip2.java
+ * 创建日期：	2013-7-24
+ * 最近修改：	2013-7-24
  * 作者：		徐犇
  */
 package ben;
@@ -12,21 +12,20 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import org.apache.commons.compress.compressors.bzip2.*;
+
 /**
- * 
- * @author ben
+ * @author Administrator
  *
  */
-public final class MyGZip extends Compressor {
-	
-	private FileNameExtensionFilter filter = new FileNameExtensionFilter(
-			"GZIP压缩文件(*.gz)", "gz");
+public final class MyBZip2 extends Compressor {
 
+	private FileNameExtensionFilter filter = new FileNameExtensionFilter(
+			"BZIP2压缩文件(*.bz2)", "bz2");
+	
 	@Override
 	public final void doCompress(File file, String destpath) throws IOException {
 		FileInputStream fis = new FileInputStream(file);
@@ -34,7 +33,7 @@ public final class MyGZip extends Compressor {
 		
 		File gf = new File(destpath);
 		FileOutputStream fos = new FileOutputStream(gf);
-		GZIPOutputStream gzos = new GZIPOutputStream(fos);
+		BZip2CompressorOutputStream gzos = new BZip2CompressorOutputStream(fos);
 		BufferedOutputStream bos = new BufferedOutputStream(gzos);
 		readAndWrite(bis, bos);
 	}
@@ -42,7 +41,7 @@ public final class MyGZip extends Compressor {
 	@Override
 	public final void doUnCompress(File srcFile, String destpath) throws IOException {
 		FileInputStream fis = new FileInputStream(srcFile);
-		GZIPInputStream gzis = new GZIPInputStream(fis);
+		BZip2CompressorInputStream gzis = new BZip2CompressorInputStream(fis);
 		BufferedInputStream bis = new BufferedInputStream(gzis);
 
 		File tf = new File(destpath);
