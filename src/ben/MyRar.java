@@ -16,6 +16,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import de.innosystec.unrar.Archive;
 import de.innosystec.unrar.exception.RarException;
 import de.innosystec.unrar.rarfile.FileHeader;
+import de.innosystec.unrar.rarfile.MainHeader;
 
 /**
  * @author ben
@@ -29,6 +30,51 @@ public final class MyRar extends Archiver {
 	@Override
 	public final void doArchiver(File[] files, String destpath)
 			throws IOException {
+	}
+	
+	private boolean crack(Archive ar, String pass, File tmpf) {
+		BufferedOutputStream bos = null;
+		try {
+			ar.setPassword(pass);
+			FileHeader fh = ar.nextFileHeader();
+			FileOutputStream fos = new FileOutputStream(tmpf);
+			bos = new BufferedOutputStream(fos);
+			ar.extractFile(fh, bos);
+			bos.flush();
+			bos.close();
+		} catch (RarException e) {
+			try {
+				bos.flush();
+				bos.close();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+			return false;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return true;
+	}
+	
+	public final String crackRar(File srcfile, String tmpdir, CodeIterator ci) {
+		//临时文件
+		File tmpf = new File(".~tmpf");
+		String pass = null;
+		String ret = null;
+		Archive ar = new Archive(srcfile);
+		while((pass = ci.nextCode()) != null) {
+			if(crack(ar, pass, tmpf)) {
+				ret = pass;
+				break;
+			}
+		}
+		try {
+			ar.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		tmpf.delete();//使用完毕，删除
+		return ret;
 	}
 
 	@Override
@@ -72,4 +118,20 @@ public final class MyRar extends Archiver {
 	public final FileNameExtensionFilter getFileFilter() {
 		return this.filter;
 	}
+}
+
+/**
+ * 继承Archive，以便对其进行修改以增加功能
+ * @author ben
+ *
+ */
+class MyArchive extends Archive {
+	public MyArchive(File file) throws RarException, IOException {
+		super(file, null, false);
+	}
+	
+	public void updatePass(String password) {
+		
+	}
+	
 }

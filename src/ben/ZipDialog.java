@@ -160,7 +160,20 @@ public final class ZipDialog extends JDialog {
 	}
 	
 	private void crackRar() {
-		
+		MyRar rar = new MyRar();
+		File f = getSelectedArchiverFile(rar.getFileFilter());
+		if (f == null) {
+			return;
+		}
+		long t = System.currentTimeMillis();
+		String pass = rar.crackRar(f, ".~tmp", new CodeIterator());
+		t = System.currentTimeMillis() - t;
+		System.out.println(t);
+		if(pass == null) {
+			JOptionPane.showMessageDialog(this, "指定的密码无法解开文件!");
+		}else {
+			JOptionPane.showMessageDialog(this, pass);
+		}
 	}
 
 
