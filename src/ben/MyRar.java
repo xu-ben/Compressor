@@ -7,9 +7,12 @@
 package ben;
 
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -31,50 +34,84 @@ public final class MyRar extends Archiver {
 	public final void doArchiver(File[] files, String destpath)
 			throws IOException {
 	}
-	
+
 	private boolean crack(Archive ar, String pass, File tmpf) {
-		BufferedOutputStream bos = null;
-		try {
-			ar.setPassword(pass);
-			FileHeader fh = ar.nextFileHeader();
-			FileOutputStream fos = new FileOutputStream(tmpf);
-			bos = new BufferedOutputStream(fos);
-			ar.extractFile(fh, bos);
-			bos.flush();
-			bos.close();
-		} catch (RarException e) {
-			try {
-				bos.flush();
-				bos.close();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-			return false;
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		// BufferedOutputStream bos = null;
+		// try {
+		// ar.setPassword(pass);
+		// FileHeader fh = ar.nextFileHeader();
+		// FileOutputStream fos = new FileOutputStream(tmpf);
+		// bos = new BufferedOutputStream(fos);
+		// ar.extractFile(fh, bos);
+		// bos.flush();
+		// bos.close();
+		// } catch (RarException e) {
+		// try {
+		// bos.flush();
+		// bos.close();
+		// } catch (IOException e1) {
+		// e1.printStackTrace();
+		// }
+		// return false;
+		// } catch (IOException e) {
+		// e.printStackTrace();
+		// }
 		return true;
 	}
-	
-	public final String crackRar(File srcfile, String tmpdir, CodeIterator ci) {
-		//临时文件
-		File tmpf = new File(".~tmpf");
-		String pass = null;
-		String ret = null;
-		Archive ar = new Archive(srcfile);
-		while((pass = ci.nextCode()) != null) {
-			if(crack(ar, pass, tmpf)) {
-				ret = pass;
-				break;
+
+	// public final String crackRar(File srcfile, String tmpdir, CodeIterator
+	// ci) {
+	// //临时文件
+	// File tmpf = new File(".~tmpf");
+	// String pass = null;
+	// String ret = null;
+	// Archive ar = new Archive(srcfile);
+	// while((pass = ci.nextCode()) != null) {
+	// if(crack(ar, pass, tmpf)) {
+	// ret = pass;
+	// break;
+	// }
+	// }
+	// try {
+	// ar.close();
+	// } catch (IOException e) {
+	// e.printStackTrace();
+	// }
+	// tmpf.delete();//使用完毕，删除
+	// return ret;
+	// }
+
+	public final String crackRar(File srcfile, CodeIterator ci) throws Exception {
+		boolean ret = false;
+		// 系统安装winrar的路径
+		String cmd = "C:\\Program Files\\WinRAR\\Rar.exe";
+		String target = srcfile.getAbsolutePath();
+		String pass = ci.nextCode();
+
+		while (!ret && pass != null) {
+			String unrarCmd = String.format("%s t -p%s %s", cmd, pass, target);
+			Runtime rt = Runtime.getRuntime();
+			Process pre = rt.exec(unrarCmd);
+			InputStreamReader isr = new InputStreamReader(pre.getInputStream(),
+					"gbk");
+			BufferedReader bf = new BufferedReader(isr);
+			String line = null;
+			while ((line = bf.readLine()) != null) {
+				if (line.indexOf("全部成功") >= 0) {
+					ret = true;
+					break;
+				}
+			}
+			bf.close();
+			if (!ret) {
+				pass = ci.nextCode();
 			}
 		}
-		try {
-			ar.close();
-		} catch (IOException e) {
-			e.printStackTrace();
+		if (ret) {
+			return pass;
+		} else {
+			return null;
 		}
-		tmpf.delete();//使用完毕，删除
-		return ret;
 	}
 
 	@Override
@@ -118,20 +155,4 @@ public final class MyRar extends Archiver {
 	public final FileNameExtensionFilter getFileFilter() {
 		return this.filter;
 	}
-}
-
-/**
- * 继承Archive，以便对其进行修改以增加功能
- * @author ben
- *
- */
-class MyArchive extends Archive {
-	public MyArchive(File file) throws RarException, IOException {
-		super(file, null, false);
-	}
-	
-	public void updatePass(String password) {
-		
-	}
-	
 }

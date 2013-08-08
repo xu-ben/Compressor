@@ -14,8 +14,11 @@ import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -158,24 +161,30 @@ public final class ZipDialog extends JDialog {
 		}
 		return o.getSelectedFile();
 	}
-	
+
 	private void crackRar() {
 		MyRar rar = new MyRar();
 		File f = getSelectedArchiverFile(rar.getFileFilter());
 		if (f == null) {
 			return;
 		}
-		long t = System.currentTimeMillis();
-		String pass = rar.crackRar(f, ".~tmp", new CodeIterator());
-		t = System.currentTimeMillis() - t;
-		System.out.println(t);
-		if(pass == null) {
-			JOptionPane.showMessageDialog(this, "指定的密码无法解开文件!");
-		}else {
-			JOptionPane.showMessageDialog(this, pass);
+//		String pass = rar.crackRar(f, ".~tmp", new CodeIterator());
+		String pass;
+		try {
+			long t = System.currentTimeMillis();
+			pass = rar.crackRar(f, new CodeIterator());
+			t = System.currentTimeMillis() - t;
+			System.out.println(t);
+
+			if (pass == null) {
+				JOptionPane.showMessageDialog(this, "指定的密码无法解开文件!");
+			} else {
+				JOptionPane.showMessageDialog(this, pass);
+			}
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(this, "破解过程中出错!");
 		}
 	}
-
 
 	private void onUnArchiverFile(Archiver ma) {
 		File f = getSelectedArchiverFile(ma.getFileFilter());
@@ -373,7 +382,7 @@ public final class ZipDialog extends JDialog {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		new ZipDialog(null);
+		 new ZipDialog(null);
 	}
 
 	/**
