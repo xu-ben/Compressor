@@ -29,7 +29,7 @@ public final class MyZip extends Archiver {
 	/**
 	 * zip文件格式的过滤器
 	 */
-	private FileNameExtensionFilter filter = new FileNameExtensionFilter(
+	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(
 			"ZIP压缩文件(*.zip)", "zip");
 
 	private void dfs(File[] files, ZipOutputStream zos, String fpath)
@@ -110,7 +110,7 @@ public final class MyZip extends Archiver {
 
 	@Override
 	public final FileNameExtensionFilter getFileFilter() {
-		return this.filter;
+		return filter;
 	}
 
 }

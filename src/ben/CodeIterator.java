@@ -13,7 +13,7 @@ package ben;
  * 
  */
 public class CodeIterator {
-	private Integer num = 980000;
+	private Integer num = 987000;
 
 	public String nextCode() {
 		if (num < 1000000) {

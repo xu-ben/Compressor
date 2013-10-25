@@ -12,14 +12,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import de.innosystec.unrar.Archive;
 import de.innosystec.unrar.exception.RarException;
 import de.innosystec.unrar.rarfile.FileHeader;
-import de.innosystec.unrar.rarfile.MainHeader;
 
 /**
  * @author ben
@@ -27,7 +25,7 @@ import de.innosystec.unrar.rarfile.MainHeader;
  */
 public final class MyRar extends Archiver {
 
-	private FileNameExtensionFilter filter = new FileNameExtensionFilter(
+	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(
 			"RAR压缩文件(*.rar)", "rar");
 
 	@Override
@@ -35,6 +33,7 @@ public final class MyRar extends Archiver {
 			throws IOException {
 	}
 
+	@SuppressWarnings("unused")
 	private boolean crack(Archive ar, String pass, File tmpf) {
 		// BufferedOutputStream bos = null;
 		// try {
@@ -84,7 +83,8 @@ public final class MyRar extends Archiver {
 	public final String crackRar(File srcfile, CodeIterator ci) throws Exception {
 		boolean ret = false;
 		// 系统安装winrar的路径
-		String cmd = "C:\\Program Files\\WinRAR\\Rar.exe";
+		String cmd = "rar.exe";
+//		String cmd = "C:\\Program Files\\WinRAR\\Rar.exe";
 		String target = srcfile.getAbsolutePath();
 		String pass = ci.nextCode();
 
@@ -97,6 +97,7 @@ public final class MyRar extends Archiver {
 			BufferedReader bf = new BufferedReader(isr);
 			String line = null;
 			while ((line = bf.readLine()) != null) {
+//				System.out.println(line);
 				if (line.indexOf("全部成功") >= 0) {
 					ret = true;
 					break;
@@ -153,6 +154,18 @@ public final class MyRar extends Archiver {
 
 	@Override
 	public final FileNameExtensionFilter getFileFilter() {
-		return this.filter;
+		return filter;
+	}
+	
+	/**
+	 * 是否已准备好(暴力破解rar密码)
+	 */
+	public static boolean isReady() {
+		try {
+			Runtime.getRuntime().exec("rar.exe");
+		} catch (IOException e) {
+			return false;
+		}
+		return true;		
 	}
 }

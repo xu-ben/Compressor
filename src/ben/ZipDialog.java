@@ -14,11 +14,8 @@ import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -151,7 +148,7 @@ public final class ZipDialog extends JDialog {
 	}
 
 	private File getSelectedArchiverFile(FileNameExtensionFilter filter) {
-		JFileChooser o = new JFileChooser("");
+		JFileChooser o = new JFileChooser(".");
 		o.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		o.setMultiSelectionEnabled(false);
 		o.addChoosableFileFilter(filter);
@@ -163,6 +160,10 @@ public final class ZipDialog extends JDialog {
 	}
 
 	private void crackRar() {
+		if(!MyRar.isReady()) {
+			JOptionPane.showMessageDialog(this, "没有找到测试程序，无法破解rar文件！");
+			return ;
+		}
 		MyRar rar = new MyRar();
 		File f = getSelectedArchiverFile(rar.getFileFilter());
 		if (f == null) {
@@ -191,7 +192,7 @@ public final class ZipDialog extends JDialog {
 		if (f == null) {
 			return;
 		}
-		JFileChooser s = new JFileChooser("");
+		JFileChooser s = new JFileChooser(".");
 		s.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		int returnVal = s.showSaveDialog(this);
 		if (returnVal != JFileChooser.APPROVE_OPTION) {
@@ -224,7 +225,7 @@ public final class ZipDialog extends JDialog {
 		}
 		String fn = file.getName();
 		fn = fn.substring(0, fn.lastIndexOf('.'));
-		JFileChooser s = new JFileChooser("");
+		JFileChooser s = new JFileChooser(".");
 		s.setSelectedFile(new File(fn));
 		s.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		int returnVal = s.showSaveDialog(this);
@@ -249,7 +250,7 @@ public final class ZipDialog extends JDialog {
 		FileNameExtensionFilter filter = c.getFileFilter();
 		String ext = "." + filter.getExtensions()[0];
 		String destpath = f.getName() + ext;
-		JFileChooser s = new JFileChooser("");
+		JFileChooser s = new JFileChooser(".");
 		s.addChoosableFileFilter(filter);
 		s.setSelectedFile(new File(destpath));
 		int returnVal = s.showSaveDialog(this);
@@ -270,7 +271,7 @@ public final class ZipDialog extends JDialog {
 	}
 
 	private void onArchiverFile(Archiver ma) {
-		JFileChooser o = new JFileChooser("");
+		JFileChooser o = new JFileChooser(".");
 		o.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 		o.setMultiSelectionEnabled(true);
 		int returnVal = o.showOpenDialog(this);
@@ -279,7 +280,7 @@ public final class ZipDialog extends JDialog {
 		}
 		File[] files = o.getSelectedFiles();
 
-		JFileChooser s = new JFileChooser("");
+		JFileChooser s = new JFileChooser(".");
 		FileNameExtensionFilter filter = ma.getFileFilter();
 		s.addChoosableFileFilter(filter);
 		returnVal = s.showSaveDialog(this);

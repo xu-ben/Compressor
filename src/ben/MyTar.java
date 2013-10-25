@@ -21,7 +21,7 @@ import org.apache.commons.compress.archivers.tar.*;
  */
 public final class MyTar extends Archiver {
 
-	private FileNameExtensionFilter filter = new FileNameExtensionFilter(
+	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(
 			"TAR打包文件(*.tar)", "tar");
 
 	private void dfs(File[] files, TarArchiveOutputStream taos, String fpath)
@@ -104,6 +104,6 @@ public final class MyTar extends Archiver {
 
 	@Override
 	public final FileNameExtensionFilter getFileFilter() {
-		return this.filter;
+		return filter;
 	}
 }

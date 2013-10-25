@@ -24,7 +24,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  */
 public final class MyGZip extends Compressor {
 	
-	private FileNameExtensionFilter filter = new FileNameExtensionFilter(
+	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(
 			"GZIP压缩文件(*.gz)", "gz");
 
 	@Override
@@ -53,6 +53,6 @@ public final class MyGZip extends Compressor {
 
 	@Override
 	public final FileNameExtensionFilter getFileFilter() {
-		return this.filter;
+		return filter;
 	}
 }

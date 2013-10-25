@@ -23,7 +23,7 @@ import org.apache.commons.compress.compressors.bzip2.*;
  */
 public final class MyBZip2 extends Compressor {
 
-	private FileNameExtensionFilter filter = new FileNameExtensionFilter(
+	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(
 			"BZIP2压缩文件(*.bz2)", "bz2");
 	
 	@Override
@@ -52,6 +52,6 @@ public final class MyBZip2 extends Compressor {
 
 	@Override
 	public final FileNameExtensionFilter getFileFilter() {
-		return this.filter;
+		return filter;
 	}
 }

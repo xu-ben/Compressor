@@ -17,7 +17,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  */
 public final class My7Zip extends Archiver {
 
-	private FileNameExtensionFilter filter = new FileNameExtensionFilter(
+	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(
 			"7-ZIP打包文件(*.7z)", "7z");
 
 
@@ -33,7 +33,7 @@ public final class My7Zip extends Archiver {
 
 	@Override
 	public final FileNameExtensionFilter getFileFilter() {
-		return this.filter;
+		return filter;
 	}
 
 }
